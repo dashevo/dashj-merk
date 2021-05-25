@@ -41,7 +41,7 @@ pub mod android {
     }
 
     #[no_mangle]
-    pub unsafe extern fn Java_org_dashj_merk_RustGreetings_verify(env: JNIEnv, _: JClass, java_bytes: jbyteArray, java_key: jbyteArray, java_expected_hash: jbyteArray) -> jbyteArray {
+    pub unsafe extern fn Java_org_dashj_merk_MerkVerifyProof_verify(env: JNIEnv, _: JClass, java_bytes: jbyteArray, java_key: jbyteArray, java_expected_hash: jbyteArray) -> jbyteArray {
 
         let bytes = env.convert_byte_array(java_bytes).expect("invalid bytes");
         let key = env.convert_byte_array(java_key).expect("invalid key");
@@ -61,6 +61,7 @@ pub mod android {
             let error = output.err();
             println!("Error decoding json: {:?}", error);
 
+            // return array of size 0 to signal failure
             env.new_byte_array(0).unwrap()
         }
     }
