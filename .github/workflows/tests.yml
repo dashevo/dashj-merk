@@ -22,5 +22,6 @@ jobs:
       run: |
         chmod +x gradlew
         chmod +x gradle/wrapper/gradle-wrapper.jar
+        rustup install nightly-2021-03-25
         ./gradlew assemble
         ./gradlew build test --info
