@@ -21,6 +21,19 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
 }
 
+task buildRustLibrary {
+    doLast {
+        exec {
+            workingDir './src/main/rust'
+            commandLine 'cargo', '+nightly-2021-03-25', 'build', '--release'
+        }
+    }
+}
+
+tasks.withType(Test) {
+    systemProperty "java.library.path", "./src/main/rust/target/release"
+}
+
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
@@ -55,6 +68,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 }
 
 assemble.dependsOn(publishToMavenLocal)
+assemble.dependsOn(buildRustLibrary)
 
 test {
     useJUnitPlatform()
@@ -90,10 +104,10 @@ uploadArchives {
             }
 
             pom.project {
-                name 'DashJ DAPI Client'
+                name 'DashJ Merk'
                 packaging 'jar'
                 groupId 'org.dashj'
-                artifactId 'merk'
+                artifactId 'dashj-merk'
                 version '0.19-SNAPSHOT'
                 description 'Dash Merk Library'
                 url 'https://github.com/hashengineering/dashj-merk'
