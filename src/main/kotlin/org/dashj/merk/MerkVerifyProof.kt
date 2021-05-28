@@ -25,9 +25,9 @@ class MerkVerifyProof {
         }
 
         @kotlin.ExperimentalUnsignedTypes
-        fun decode (bytes: ByteArray): List<ByteArray> {
+        fun decode (bytes: ByteArray): Map<ByteArrayKey, ByteArray> {
             var i = 0
-            val result = arrayListOf<ByteArray>()
+            val result = hashMapOf<ByteArrayKey, ByteArray>()
             while (i < bytes.size) {
                 when (bytes[i].toInt()) {
                     1 -> {
@@ -62,7 +62,7 @@ class MerkVerifyProof {
                         println("                     =>      $valueSize ${value.toHexString()}")
                         val map = Cbor.decode(value)
                         println("                     => $map")
-                        result.add(value)
+                        result[ByteArrayKey(key)] = value
                     }
                     0x10 -> {
                         println("Parent => 0x10")
