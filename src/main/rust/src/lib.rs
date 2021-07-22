@@ -19,10 +19,9 @@ pub mod android {
     use super::*;
 
     use self::jni::JNIEnv;
-    use self::jni::objects::{JClass, JString};
-    use self::jni::sys::{jstring, jbyteArray};
-    use merk::verify_proof;
-    //use merk::verify_query;
+    use self::jni::objects::{JClass, JString, JObject, JMap};
+    use self::jni::sys::{jstring, jbyteArray, jobject};
+    use merk::{verify, execute_proof};
     use std::convert::TryInto;
 
     #[no_mangle]
@@ -36,12 +35,12 @@ pub mod android {
         output.into_inner()
     }
 
-    fn pop(barry: &[u8]) -> &[u8; 20] {
+    fn pop(barry: &[u8]) -> &[u8; 32] {
         barry.try_into().expect("slice with incorrect length")
     }
-
+/*
     #[no_mangle]
-    pub unsafe extern fn Java_org_dashj_merk_MerkVerifyProof_verify(env: JNIEnv, _: JClass, java_bytes: jbyteArray, java_key: jbyteArray, java_expected_hash: jbyteArray) -> jbyteArray {
+    pub unsafe extern fn Java_org_dashj_merk_MerkVerifyProof_verify_old(env: JNIEnv, _: JClass, java_bytes: jbyteArray, java_key: jbyteArray, java_expected_hash: jbyteArray) -> jbyteArray {
 
         let bytes = env.convert_byte_array(java_bytes).expect("invalid bytes");
         let key = env.convert_byte_array(java_key).expect("invalid key");
@@ -65,4 +64,61 @@ pub mod android {
             env.new_byte_array(0).unwrap()
         }
     }
+
+    #[no_mangle]
+    pub unsafe extern fn Java_org_dashj_merk_MerkVerifyProof_verify(env: JNIEnv, _: JClass, java_bytes: jbyteArray, java_expected_hash: jbyteArray) -> jbyteArray {
+
+        let bytes = env.convert_byte_array(java_bytes).expect("invalid bytes");
+        let expected_hash = env.convert_byte_array(java_expected_hash).expect("invalid expected hash");
+        println!("Parameters passed from Kotlin that were converted to Rust:");
+        println!("bytes: {}", hex::encode(bytes.clone()));
+        println!("hash:  {}", hex::encode(expected_hash.clone()));
+
+        let output = verify(bytes.as_slice(), *pop(expected_hash.as_slice()));
+
+        if output.is_ok() {
+            let result = env.byte_array_from_slice(output.unwrap()[0].as_ref().expect("no values found").as_slice());
+            result.unwrap()
+        } else {
+            let error = output.err();
+            println!("Error decoding json: {:?}", error);
+
+            // return array of size 0 to signal failure
+            env.new_byte_array(0).unwrap()
+        }
+    }
+*/
+    type jmap = jobject;
+    #[no_mangle]
+    pub unsafe extern fn Java_org_dashj_merk_MerkVerifyProof_extractProofNative(env: JNIEnv, _: JClass, java_bytes: jbyteArray, java_map: jobject) {
+
+        let bytes = env.convert_byte_array(java_bytes).expect("invalid bytes");
+        println!("Parameters passed from Kotlin that were converted to Rust:");
+        println!("bytes: {}", hex::encode(bytes.clone()));
+
+        //let keys: Vec<u8> = key.iter().cloned().collect();
+        let output = execute_proof(bytes.as_slice());
+
+        match output  {
+            Err(_) => {
+                let error = output.err();
+                println!("Error decoding json: {:?}", error);
+            }
+            Ok((hash, map)) => {
+                let jmap = env.get_map(java_map.into()).unwrap();
+
+                for key_value_pair in map.all() {
+                    let key = key_value_pair.0;
+                    let (exists, value) = key_value_pair.1;
+
+                    let javaKey = env.byte_array_from_slice(&*key).unwrap();
+                    let javaValue = env.byte_array_from_slice(value).unwrap();
+
+                    jmap.put(JObject::from(javaKey), JObject::from(javaValue));
+                };
+            }
+        }
+    }
+
+
 }

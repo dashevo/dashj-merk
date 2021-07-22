@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'org.dashj'
-version '0.19-SNAPSHOT'
+version '0.20-SNAPSHOT'
 
 repositories {
     mavenLocal()
@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation 'org.dashj.platform:dpp:0.19-SNAPSHOT'
+    implementation 'org.dashj.platform:dpp:0.20-SNAPSHOT'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
 }
@@ -26,7 +26,7 @@ task buildRustLibrary {
     doLast {
         exec {
             workingDir './src/main/rust'
-            commandLine 'cargo', '+nightly-2021-03-25', 'build', '--release'
+            commandLine 'cargo', '+nightly', 'build', '--release'
         }
     }
 }
