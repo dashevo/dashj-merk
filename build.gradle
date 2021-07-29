@@ -108,7 +108,7 @@ uploadArchives {
             pom.project {
                 name 'DashJ Merk'
                 packaging 'jar'
-                groupId group
+                groupId 'org.dashj'
                 artifactId 'dashj-merk'
                 version version
                 description 'Dash Merk Library'
