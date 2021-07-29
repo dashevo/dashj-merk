@@ -9,5 +9,6 @@ class ByteArrayKey(private val bytes: ByteArray) {
     override fun hashCode(): Int = bytes.contentHashCode()
     override fun toString(): String = bytes.toHexString()
     fun toByteArray(): ByteArray {
-        return bytes; }
+        return bytes
+    }
 }
