@@ -7,23 +7,36 @@ import org.dashj.platform.dpp.util.Cbor
 class MerkVerifyProof {
     companion object {
         @JvmStatic
-        private external fun verify(bytes: ByteArray, expectedHash: ByteArray): ByteArray
+        private external fun verify(bytes: ByteArray, expectedHash: ByteArray, map: Any): Boolean
         @JvmStatic
-        private external fun extractProofNative(bytes: ByteArray, map: Any)
-        // private external fun extract_proof(bytes: ByteArray): Pair<ByteArray, Map<ByteArray, ByteArray>>
+        private external fun extractProofNative(bytes: ByteArray, map: Any): ByteArray
+        @JvmStatic
+        private external fun getVersion(): String
+
+        private const val version = "0.20-SNAPSHOT"
 
         @JvmStatic
         fun init() {
             try {
                 System.loadLibrary("dashj_merk")
-            } catch (e: Exception) {
-                println(e)
+
+                val rustVersion = getVersion()
+                if (rustVersion != version) {
+                    throw RuntimeException("Native rust code version $rustVersion doesn't match Kotlin version $version")
+                }
+            } catch (e: UnsatisfiedLinkError) {
+                throw RuntimeException(e)
             }
         }
 
         @JvmStatic
-        fun verifyProof(bytes: ByteArray, expectedHash: ByteArray): ByteArray {
-            return verify(bytes, expectedHash)
+        fun verifyProof(bytes: ByteArray, expectedHash: ByteArray, map: MutableMap<ByteArrayKey, ByteArray>): Boolean {
+            val verifiedMap = HashMap<ByteArray, ByteArray>()
+            val verified = verify(bytes, expectedHash, verifiedMap)
+            for (entry in verifiedMap) {
+                map[ByteArrayKey(entry.key)] = entry.value
+            }
+            return verified
         }
 
         @JvmStatic
@@ -35,6 +48,17 @@ class MerkVerifyProof {
                 mapReturn[ByteArrayKey(entry.key)] = entry.value
             }
             return mapReturn
+        }
+
+        @JvmStatic
+        fun extractProofWithHash(bytes: ByteArray): Pair<ByteArray, Map<ByteArrayKey, ByteArray>> {
+            val map = HashMap<ByteArray, ByteArray>()
+            val hash = extractProofNative(bytes, map)
+            val mapReturn = HashMap<ByteArrayKey, ByteArray>()
+            for (entry in map) {
+                mapReturn[ByteArrayKey(entry.key)] = entry.value
+            }
+            return Pair(hash, mapReturn)
         }
 
         private val HASH_SIZE = 32
