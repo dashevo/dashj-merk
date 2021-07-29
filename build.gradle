@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
     id 'maven-publish'
     id 'maven'
     id 'signing'
@@ -17,6 +17,7 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "io.github.rctcwyvrn:blake3:1.3"
     implementation 'org.dashj.platform:dpp:0.20-SNAPSHOT'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
@@ -107,9 +108,9 @@ uploadArchives {
             pom.project {
                 name 'DashJ Merk'
                 packaging 'jar'
-                groupId 'org.dashj'
+                groupId group
                 artifactId 'dashj-merk'
-                version '0.19-SNAPSHOT'
+                version version
                 description 'Dash Merk Library'
                 url 'https://github.com/hashengineering/dashj-merk'
 
