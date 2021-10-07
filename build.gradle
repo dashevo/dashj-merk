@@ -4,6 +4,7 @@ plugins {
     id 'maven'
     id 'signing'
     id 'java'
+    id('io.gitlab.arturbosch.detekt').version("1.1.1")
 }
 
 group 'org.dashj'
@@ -137,3 +138,5 @@ uploadArchives {
         }
     }
 }
+
+apply from: 'ktlint.gradle'
