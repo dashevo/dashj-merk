@@ -26,7 +26,7 @@ pub mod android {
 
     #[no_mangle]
     pub unsafe extern fn Java_org_dashj_merk_MerkVerifyProof_getVersion(env: JNIEnv, _: JClass) -> jstring {
-        let world_ptr = CString::new("0.20-SNAPSHOT");
+        let world_ptr = CString::new("0.21-SNAPSHOT");
         let output = env.new_string(world_ptr.unwrap().to_str().unwrap()).expect("Couldn't create java string!");
 
         output.into_inner()
@@ -57,7 +57,7 @@ pub mod android {
 
                 for key_value_pair in map.all() {
                     let key = key_value_pair.0;
-                    let (exists, value) = key_value_pair.1;
+                    let (_exists, value) = key_value_pair.1;
 
                     let javaKey = env.byte_array_from_slice(&*key).unwrap();
                     let javaValue = env.byte_array_from_slice(value).unwrap();
@@ -89,7 +89,7 @@ pub mod android {
 
                 for key_value_pair in map.all() {
                     let key = key_value_pair.0;
-                    let (exists, value) = key_value_pair.1;
+                    let (_exists, value) = key_value_pair.1;
 
                     let javaKey = env.byte_array_from_slice(&*key).unwrap();
                     let javaValue = env.byte_array_from_slice(value).unwrap();
