@@ -1,4 +1,10 @@
 package org.dashj.merk
+/**
+ * Copyright (c) 2021-present, Dash Core Team
+ *
+ * This source code is licensed under the MIT license found in the
+ * COPYING file in the root directory of this source tree.
+ */
 
 import org.dashj.platform.dpp.toHexString
 import org.dashj.platform.dpp.util.HashUtils
