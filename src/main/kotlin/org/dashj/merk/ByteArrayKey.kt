@@ -7,7 +7,7 @@
 
 package org.dashj.merk
 
-import org.dashj.platform.dpp.toHexString
+import org.dashj.platform.dpp.toHex
 
 class ByteArrayKey(private val bytes: ByteArray) {
     override fun equals(other: Any?): Boolean =

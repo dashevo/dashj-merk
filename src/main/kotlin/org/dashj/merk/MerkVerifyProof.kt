@@ -7,9 +7,10 @@
 
 package org.dashj.merk
 
+import org.dashj.platform.dpp.Factory
+import org.dashj.platform.dpp.ProtocolVersion
 import org.dashj.platform.dpp.toBase58
-import org.dashj.platform.dpp.toHexString
-import org.dashj.platform.dpp.util.Cbor
+import org.dashj.platform.dpp.toHex
 
 class MerkVerifyProof {
     companion object {
@@ -20,7 +21,7 @@ class MerkVerifyProof {
         @JvmStatic
         private external fun getVersion(): String
 
-        private const val version = "0.20-SNAPSHOT"
+        private const val version = "0.21-SNAPSHOT"
 
         @JvmStatic
         fun init() {
@@ -68,10 +69,10 @@ class MerkVerifyProof {
             return Pair(hash, mapReturn)
         }
 
-        private val HASH_SIZE = 32
+        private const val HASH_SIZE = 32
 
         @kotlin.ExperimentalUnsignedTypes
-        fun decode(bytes: ByteArray): Map<ByteArrayKey, ByteArray> {
+        fun extractDataDebug(bytes: ByteArray): Map<ByteArrayKey, ByteArray> {
             var i = 0
             val result = hashMapOf<ByteArrayKey, ByteArray>()
             while (i < bytes.size) {
@@ -81,14 +82,14 @@ class MerkVerifyProof {
                         val hash = bytes.copyOfRange(i, i + HASH_SIZE)
                         i += HASH_SIZE
                         println("Push(Hash(hash)) => 0x01 <32-byte hash>")
-                        println("                 =>      ${hash.toHexString()}")
+                        println("                 =>      ${hash.toHex()}")
                     }
                     2 -> {
                         i++
                         val hash = bytes.copyOfRange(i, i + HASH_SIZE)
                         i += HASH_SIZE
                         println("Push(KVHash(hash)) => 0x02 <32-byte hash>")
-                        println("                 =>        ${hash.toHexString()}")
+                        println("                 =>        ${hash.toHex()}")
                     }
                     3 -> {
                         i++
@@ -104,9 +105,9 @@ class MerkVerifyProof {
                         i += valueSize
 
                         println("Push(KV(key, value)) => 0x03 <1-byte key length> <n-byte key> <2-byte value length> <n-byte value>")
-                        println("                     =>      $keySize ${key.toHexString()} / ${key.toBase58()}")
-                        println("                     =>      $valueSize ${value.toHexString()}")
-                        val map = Cbor.decode(value)
+                        println("                     =>      $keySize ${key.toHex()} / ${key.toBase58()}")
+                        println("                     =>      $valueSize ${value.toHex()}")
+                        val map = Factory.decodeProtocolEntity(value, ProtocolVersion.latestVersion)
                         println("                     => $map")
                         result[ByteArrayKey(key)] = value
                     }
@@ -127,23 +128,48 @@ class MerkVerifyProof {
             return result
         }
 
-        fun decodeRootHash(bytes: ByteArray): ByteArray? {
+        @kotlin.ExperimentalUnsignedTypes
+        @JvmStatic
+        fun extractData(bytes: ByteArray): Map<ByteArrayKey, ByteArray> {
             var i = 0
+            val result = hashMapOf<ByteArrayKey, ByteArray>()
             while (i < bytes.size) {
-                return when (bytes[i].toInt()) {
+                when (bytes[i].toInt()) {
                     1 -> {
                         i++
-                        val hash = bytes.copyOfRange(i, i + 20)
-                        println(hash.toHexString())
-                        hash
+                        i += HASH_SIZE
+                    }
+                    2 -> {
+                        i++
+                        i += HASH_SIZE
+                    }
+                    3 -> {
+                        i++
+                        val keySize = bytes[i].toInt()
+                        i++
+                        val key = bytes.copyOfRange(i, i + keySize)
+                        i += keySize
+                        val valueSizeLow = bytes[i + 1].toUByte().toInt()
+                        val valueSizeHigh = bytes[i].toUByte().toInt()
+                        val valueSize = valueSizeHigh * 256 + valueSizeLow
+                        i += 2
+                        val value = bytes.copyOfRange(i, i + valueSize)
+                        i += valueSize
+
+                        result[ByteArrayKey(key)] = value
+                    }
+                    0x10 -> {
+                        i++
+                    }
+                    0x11 -> {
+                        i++
                     }
                     else -> {
-                        println("unknown ${bytes[i]}")
-                        null
+                        i++
                     }
                 }
             }
-            return null
+            return result
         }
     }
 }
