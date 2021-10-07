@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'org.dashj'
-version '0.20-SNAPSHOT'
+version '0.21-SNAPSHOT'
 
 repositories {
     mavenLocal()
@@ -17,8 +17,7 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation "io.github.rctcwyvrn:blake3:1.3"
-    implementation 'org.dashj.platform:dpp:0.20-SNAPSHOT'
+    implementation 'org.dashj.platform:dpp:0.21-SNAPSHOT'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
 }
