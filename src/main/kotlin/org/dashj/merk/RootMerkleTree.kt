@@ -8,9 +8,22 @@
 package org.dashj.merk
 
 import io.github.rctcwyvrn.blake3.Blake3
-import kotlin.experimental.and
+import java.security.MessageDigest
+import kotlin.math.ceil
 
-class RootMerkleTree(val elementToProve: ByteArray, val rootTreeProof: ByteArray) {
+@Deprecated("use Indices instead in dapi-client")
+enum class PlatformDictionary(val value: Int) {
+    Contracts(3),
+    Documents(4),
+    Identities(1),
+    PublicKeyHahsesToIdentityIds(2);
+}
+@Deprecated("use MerkleTree instead in dapi-client")
+class RootMerkleTree(
+    val elementsToProve: Map<Int, ByteArray>,
+    val rootTreeProof: ByteArray,
+    val fixedElementCount: Int = 6
+) {
 
     companion object {
         fun hash(data: ByteArray): ByteArray {
@@ -18,54 +31,79 @@ class RootMerkleTree(val elementToProve: ByteArray, val rootTreeProof: ByteArray
             hasher.update(data)
             return hasher.digest()
         }
-        fun double_hash(data: ByteArray): ByteArray {
+        fun hashTwice(data: ByteArray): ByteArray {
             return hash(hash(data))
+        }
+
+        var digest = MessageDigest.getInstance("SHA-256")
+
+        fun sha256(data: ByteArray): ByteArray {
+            return digest.digest(data)
         }
     }
 
-    private var flags: ByteArray
     private val proofHashes = arrayListOf<ByteArray>()
 
-    init {
-        var offset = 0
-        val leafCount = rootTreeProof.getIntAtLE(offset)
-        if (leafCount != 1) {
-            throw IllegalArgumentException("Leaf count must be 1, but instead is $leafCount")
-        }
-        offset += 4
+    fun getProofHashes(): List<ByteArray> {
+        return proofHashes
+    }
 
-        val (varIntSize, length) = rootTreeProof.getVarInt(offset)
-        offset += varIntSize
+    init {
+        val length = rootTreeProof.size / 32
+        var offset = 0
 
         for (i in 0 until length) {
             proofHashes.add(rootTreeProof.copyOfRange(offset, offset + 32))
             offset += 32
         }
-
-        // flags
-        val (varIntSize2, flagsLength) = rootTreeProof.getVarInt(offset)
-        offset += varIntSize2
-        flags = rootTreeProof.copyOfRange(offset, (offset + flagsLength).toInt())
     }
 
-    fun merkleRoot(): ByteArray {
-        var merkelRoot = elementToProve
-        for ((i, leaf) in proofHashes.withIndex()) {
-            val proofIsRight = (flags[i / 8] and (1 shl (i % 8)).toByte()).toInt() != 0
-            var left: ByteArray
-            val right: ByteArray
+    fun merkelRoot(): ByteArray {
+        var rowElements = elementsToProve
+        var rowSize = fixedElementCount
 
-            if (proofIsRight) {
-                right = leaf
-                left = merkelRoot
-            } else {
-                right = merkelRoot
-                left = leaf
+        while (proofHashes.size > 0 || rowElements.size > 1) {
+            val nextRowElements = hashMapOf<Int, ByteArray>()
+            val positions = rowElements.keys.toMutableList()
+            positions.sort()
+            var i = 0
+            while (i < positions.size) {
+                val number = positions[i]
+                val storeTreeRootHash = rowElements[number]!!
+                var left: ByteArray
+                var right: ByteArray
+                val pos = number
+                if (pos == rowSize - 1) {
+                    nextRowElements[pos / 2] = storeTreeRootHash
+                    i++
+                    continue
+                }
+                if (number % 2 != 0) {
+                    // Right side
+                    right = storeTreeRootHash
+                    left = proofHashes.first()
+                    proofHashes.removeAt(0)
+                } else {
+                    // Left Side
+                    left = storeTreeRootHash
+                    if (rowElements[pos + 1] != null) {
+                        // Both elements are known, no proof needed
+                        right = rowElements[pos + 1]!!
+                        i++
+                    } else {
+                        right = proofHashes.first()
+                        proofHashes.removeAt(0)
+                    }
+                }
+
+                val concat = left.plus(right)
+                val merkelRoot = hash(concat)
+                nextRowElements[pos / 2] = merkelRoot
+                i++
             }
-
-            val concat = left.reversedArray().plus(right.reversedArray())
-            merkelRoot = double_hash(concat).reversedArray()
+            rowElements = nextRowElements
+            rowSize = ceil(rowSize.toDouble() / 2).toInt()
         }
-        return merkelRoot
+        return rowElements[0]!!
     }
 }
