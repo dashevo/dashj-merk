@@ -40,6 +40,8 @@ class RootMerkleTree(
         fun sha256(data: ByteArray): ByteArray {
             return digest.digest(data)
         }
+
+        private const val HASH_SIZE = 32
     }
 
     private val proofHashes = arrayListOf<ByteArray>()
@@ -49,12 +51,12 @@ class RootMerkleTree(
     }
 
     init {
-        val length = rootTreeProof.size / 32
+        val length = rootTreeProof.size / HASH_SIZE
         var offset = 0
 
         for (i in 0 until length) {
-            proofHashes.add(rootTreeProof.copyOfRange(offset, offset + 32))
-            offset += 32
+            proofHashes.add(rootTreeProof.copyOfRange(offset, offset + HASH_SIZE))
+            offset += HASH_SIZE
         }
     }
 
