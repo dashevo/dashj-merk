@@ -1,6 +1,6 @@
 # Installing Build tools
 ```shell
-rustup install nightly-2021-03-25
+rustup install nightly
 ```
 
 # Build with Gradle
@@ -15,7 +15,7 @@ rustup install nightly-2021-03-25
 # Build Rust Library Manually
 ```shell
 cd src/main/rust
-cargo +nightly-2021-03-25 build --release
+cargo +nightly build --release
 ```
 
 # Publish
