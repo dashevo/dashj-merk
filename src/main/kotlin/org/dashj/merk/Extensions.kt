@@ -7,6 +7,7 @@
 
 package org.dashj.merk
 
+@Suppress("MagicNumber")
 @OptIn(ExperimentalUnsignedTypes::class)
 fun ByteArray.getUIntAtBE(idx: Int) =
     ((this[idx].toUInt() and 0xFFu) shl 24) or
@@ -14,26 +15,31 @@ fun ByteArray.getUIntAtBE(idx: Int) =
         ((this[idx + 2].toUInt() and 0xFFu) shl 8) or
         (this[idx + 3].toUInt() and 0xFFu)
 
+@Suppress("MagicNumber")
 fun ByteArray.getShortAtBE(idx: Int) =
     ((this[idx].toInt() and 0xFF) shl 24) or
         ((this[idx + 1].toInt() and 0xFF) shl 16)
 
+@Suppress("MagicNumber")
 fun ByteArray.getShortAtLE(idx: Int) =
     ((this[idx + 1].toInt() and 0xFF) shl 24) or
         ((this[idx].toInt() and 0xFF) shl 16)
 
+@Suppress("MagicNumber")
 fun ByteArray.getIntAtBE(idx: Int) =
     ((this[idx].toInt() and 0xFF) shl 24) or
         ((this[idx + 1].toInt() and 0xFF) shl 16) or
         ((this[idx + 2].toInt() and 0xFF) shl 8) or
         (this[idx + 3].toInt() and 0xFF)
 
+@Suppress("MagicNumber")
 fun ByteArray.getIntAtLE(idx: Int) =
     ((this[idx + 3].toInt() and 0xFF) shl 24) or
         ((this[idx + 2].toInt() and 0xFF) shl 16) or
         ((this[idx + 1].toInt() and 0xFF) shl 8) or
         (this[idx].toInt() and 0xFF)
 
+@Suppress("MagicNumber")
 fun ByteArray.getLongAtBE(idx: Int) =
     ((this[idx].toInt() and 0xFF) shl 56) or
         ((this[idx + 1].toInt() and 0xFF) shl 48) or
@@ -44,6 +50,7 @@ fun ByteArray.getLongAtBE(idx: Int) =
         ((this[idx + 6].toInt() and 0xFF) shl 8) or
         (this[idx + 7].toInt() and 0xFF)
 
+@Suppress("MagicNumber")
 fun ByteArray.getLongAtLE(idx: Int) =
     ((this[idx + 7].toInt() and 0xFF) shl 56) or
         ((this[idx + 6].toInt() and 0xFF) shl 48) or
@@ -54,6 +61,7 @@ fun ByteArray.getLongAtLE(idx: Int) =
         ((this[idx + 1].toInt() and 0xFF) shl 8) or
         (this[idx].toInt() and 0xFF)
 
+@Suppress("MagicNumber")
 fun ByteArray.getVarInt(offset: Int): Pair<Int, Long> {
     val first: Int = 0xFF and this[offset].toInt()
     return if (first < 253) {
