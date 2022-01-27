@@ -8,7 +8,6 @@
 package org.dashj.merk
 
 import org.dashj.platform.dpp.Factory
-import org.dashj.platform.dpp.ProtocolVersion
 import org.dashj.platform.dpp.toBase58
 import org.dashj.platform.dpp.toHex
 
