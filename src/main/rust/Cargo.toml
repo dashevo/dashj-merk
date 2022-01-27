@@ -11,8 +11,8 @@ jni = { version = "0.5", default-features = false }
 hex = { version = "0.3.0" }
 
 [dependencies.merk]
-git = "https://github.com/QuantumExplorer/merk"
-branch = "improvement/proofRoot2"
+git = "https://github.com/dashevo/merk.git"
+branch = "v0.1-dev-stable"
 features = ["verify"]
 default-features = false
 
