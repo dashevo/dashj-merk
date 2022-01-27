@@ -43,7 +43,7 @@ class MerkVerifyProofTest {
             println("key returned: ${firstKey.toByteArray().toHex()}")
             println("key returned: ${Identifier.from(firstKey.toByteArray())}")
             println("value returned: ${firstValue.toHex()}")
-            println("value extracted: ${Factory.decodeProtocolEntity(firstValue, 0)}")
+            println("value extracted: ${Factory.decodeProtocolEntity(firstValue)}")
         } else {
             println("verification failed")
             fail<Nothing>("verification failed")
