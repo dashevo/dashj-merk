@@ -1,5 +1,4 @@
-use std::os::raw::{c_char};
-use std::ffi::{CString, CStr};
+use std::ffi::{CString};
 
 #[allow(non_snake_case)]
 pub mod android {
@@ -15,7 +14,7 @@ pub mod android {
 
     #[no_mangle]
     pub unsafe extern fn Java_org_dashj_merk_MerkVerifyProof_getVersion(env: JNIEnv, _: JClass) -> jstring {
-        let world_ptr = CString::new("0.21-SNAPSHOT");
+        let world_ptr = CString::new("0.22-SNAPSHOT");
         let output = env.new_string(world_ptr.unwrap().to_str().unwrap()).expect("Couldn't create java string!");
 
         output.into_inner()
@@ -89,6 +88,4 @@ pub mod android {
             }
         }
     }
-
-
 }

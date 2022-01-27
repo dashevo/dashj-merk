@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'org.dashj'
-version '0.21-SNAPSHOT'
+version '0.22-SNAPSHOT'
 
 repositories {
     mavenLocal()

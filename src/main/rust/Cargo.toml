@@ -1,6 +1,6 @@
 [package]
 name = "dashj-merk"
-version = "0.1.0"
+version = "0.22.0"
 authors = ["HashEngineering <hashengineeringsolutions@gmail.com>"]
 edition = "2018"
 

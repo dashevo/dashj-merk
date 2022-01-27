@@ -21,7 +21,7 @@ class MerkVerifyProof {
         @JvmStatic
         private external fun getVersion(): String
 
-        private const val version = "0.21-SNAPSHOT"
+        private const val version = "0.22-SNAPSHOT"
 
         @JvmStatic
         fun init() {
