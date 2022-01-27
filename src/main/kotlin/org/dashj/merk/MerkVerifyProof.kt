@@ -107,7 +107,7 @@ class MerkVerifyProof {
                         println("Push(KV(key, value)) => 0x03 <1-byte key length> <n-byte key> <2-byte value length> <n-byte value>")
                         println("                     =>      $keySize ${key.toHex()} / ${key.toBase58()}")
                         println("                     =>      $valueSize ${value.toHex()}")
-                        val map = Factory.decodeProtocolEntity(value, ProtocolVersion.latestVersion)
+                        val map = Factory.decodeProtocolEntity(value)
                         println("                     => $map")
                         result[ByteArrayKey(key)] = value
                     }
